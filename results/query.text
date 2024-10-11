@@ -1,0 +1,43 @@
+// 1. Query to fetch customers from paid accounts using aggregation pipeline
+
+Query : [
+  {
+    $lookup: {
+      from: "customer",
+      localField: "_id",
+      foreignField: "accountId.$id",
+      as: "customerList" //Will return array of customers if present otherwise empty array
+    }
+  }
+]
+
+Testing ENV : MongoDB compass -> Accouts collection -> Aggregations Text Query Space
+Output : Return All acccount list along with the Customers linked with it("customerList" ARRAY).
+
+// 2. Query to get the count of customers for each account using aggregation pipeline
+
+Query : [
+  {
+    $lookup: {
+      from: "customer",
+      localField: "_id",
+      foreignField: "accountId.$id",
+      as: "customerList"    //Will return array
+    }
+  },
+  {
+    $addFields: {
+      customersCount: { $size: "$customerList" } // Will create field to store the returned customerList array length
+    }
+  },
+  {
+    $project: {
+      name: 1,
+      status: 1,
+      customersCount: 1
+    }
+  }
+]
+
+Testing ENV : MongoDB compass -> Accouts collection -> Aggregations Text Query Space
+Output : Return All the accounts along with the count of customers("customersCount") linked with it.
